@@ -1,21 +1,25 @@
-﻿using System.Linq;
+﻿using System.Data.Entity;
+using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Http;
 using WebApi.OutputCache.V2;
+using MovieApi.Context;
+using MovieApi.Models;
 
 
 namespace MovieApi.Controllers
 {
     public class MoviesController : ApiController
     {
-        private MovieDbContext db = new MovieDbContext();
+        private readonly MovieDbContext db = new MovieDbContext();
 
         // GET: api/movies
         // Returns a page of movies
         [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
-        public IHttpActionResult GetMovies(int pageNumber = 1, int pageSize = 10)
+        public async Task<IHttpActionResult> GetMovies(int pageNumber = 1, int pageSize = 10)
         {
-            var sorted = db.Movies.OrderBy(m => m.Title);
+            var sorted = await db.Movies.OrderBy(m => m.Title).ToListAsync();
             if (sorted == null)
             {
                 return StatusCode(HttpStatusCode.NoContent);
@@ -41,29 +45,14 @@ namespace MovieApi.Controllers
         // Returns the actors which contributed to the movie with a given id
         [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
         [Route("api/movies/{id}/credits")]
-        public IHttpActionResult GetActors(int id)
+        public async Task<IHttpActionResult> GetActors(int id)
         {
-            var actors = from actor in db.Actors
+            var actors = await (from actor in db.Actors
                          join movie in db.MovieCasts on actor.ActorId equals movie.ActorId
                          where movie.MovieId == id
-                         select actor;
+                         select actor).ToListAsync();
 
             return Ok(actors);
-        }
-
-        // GET: api/movies?search=
-        // Returns movies which name starts or matches with the query string
-        [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
-        [HttpGet]
-        public IHttpActionResult Query(string search)
-        {
-            if (string.IsNullOrWhiteSpace(search))
-            {
-                return BadRequest("Unvalid search string");
-            }
-
-            return Ok(db.Movies.Where(a => a.Title.Contains(search)));
-
         }
     }
 }

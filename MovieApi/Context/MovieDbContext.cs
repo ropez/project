@@ -1,5 +1,6 @@
-namespace MovieApi
+namespace MovieApi.Context
 {
+    using MovieApi.Models;
     using System.Data.Entity;
 
     public partial class MovieDbContext : DbContext

@@ -2,26 +2,27 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Routing;
 using WebApi.OutputCache.V2;
+using MovieApi.Models;
+using MovieApi.Context;
+using System.Collections.Generic;
 
 namespace MovieApi.Controllers
-
-/*
- * Async await?
- */
+    
 {
     public class ActorsController : ApiController
     {
-        private MovieDbContext db = new MovieDbContext();
+        private readonly MovieDbContext db = new MovieDbContext();
 
         // GET: api/Actors
         // Returns a page of actors
         [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
-        public IHttpActionResult GetActors(int pageNumber=1, int pageSize=10)
+        public async Task<IHttpActionResult> GetActors(int pageNumber=1, int pageSize=10)
         {
-            var sorted = db.Actors.OrderBy(a => a.Name);
+            var sorted = await db.Actors.OrderBy(a => a.Name).ToListAsync();
             if(sorted == null)
             {
                 return StatusCode(HttpStatusCode.NoContent);
@@ -42,34 +43,21 @@ namespace MovieApi.Controllers
 
             return Ok(actor);
         }
-
+        
         // GET: api/Actors/Credits/id
         // Returns the movies the actor with a specific id has starred in
         [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
         [Route("api/actors/{id}/credits")]
-        public IHttpActionResult GetMovies(int id)
+        public async Task<IHttpActionResult> GetMovies(int id)
         {
-            var movies = from movie in db.Movies
+            var movies = await(from movie in db.Movies
                          join actor in db.MovieCasts on movie.MovieId equals actor.MovieId
                          where actor.ActorId == id
-                         select movie;
+                         select movie).ToListAsync();
 
             return Ok(movies);
         }
 
-        // GET: api/actors?search=
-        // Returns actors which name starts or matches with the query string
-        [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
-        [HttpGet]
-        public IHttpActionResult Query(string search)
-        {
-            if (string.IsNullOrWhiteSpace(search))
-            {
-                return BadRequest("Unvalid search string");
-            }
-
-            return Ok(db.Actors.Where(a => a.Name.Contains(search)));
-            
-        }
+       
     }
 }
