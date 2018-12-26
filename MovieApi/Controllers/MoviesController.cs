@@ -6,38 +6,44 @@ using System.Web.Http;
 using WebApi.OutputCache.V2;
 using MovieApi.Context;
 using MovieApi.Models;
-
+using MovieApi.Interfaces;
 
 namespace MovieApi.Controllers
 {
     public class MoviesController : ApiController
     {
-        private readonly MovieDbContext db = new MovieDbContext();
+        private IMDbContext db = new MDbContext();
 
-        // GET: api/movies
-        // Returns a page of movies
-        [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
-        public async Task<IHttpActionResult> GetMovies(int pageNumber = 1, int pageSize = 10)
+        public MoviesController() { }
+
+        public MoviesController(IMDbContext db)
         {
-            var sorted = await db.Movies.OrderBy(m => m.Title).ToListAsync();
-            if (sorted == null)
-            {
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-
-            return Ok(sorted.Skip((pageNumber - 1) * pageSize).Take(pageSize));
+            this.db = db;
         }
 
         // GET: api/movies/5
         // Returns the movie with a specific id
         public IHttpActionResult GetMovie(int id)
         {
-            Movie movie = db.Movies.Find(id);
-            if (movie == null)
+            var movie = db.Movies
+                    .Where(m => m.MovieId == id)
+                    .Select(m => new {
+                         MovieId = m.MovieId,
+                         Title = m.Title,
+                         Description = m.Description,
+                         Rating = m.Rating,
+                         PosterUrl = m.PosterUrl,
+                         Released = m.Released,
+                         BackDropUrl = m.BackDropUrl,
+                         Genres = m.Genres.Select(g => g.Name),
+                         Directors = m.Directors.Select(d => d.Name),
+                     });
+
+            if (!movie.Any())
             {
                 return StatusCode(HttpStatusCode.NoContent);
             }
-
+            
             return Ok(movie);
         }
 
@@ -48,11 +54,48 @@ namespace MovieApi.Controllers
         public async Task<IHttpActionResult> GetActors(int id)
         {
             var actors = await (from actor in db.Actors
-                         join movie in db.MovieCasts on actor.ActorId equals movie.ActorId
-                         where movie.MovieId == id
-                         select actor).ToListAsync();
+                                join movie in db.MovieCasts on actor.ActorId equals movie.ActorId
+                                where movie.MovieId == id
+                                select new {
+                                    ActorId = actor.ActorId,
+                                    Name = actor.Name,
+                                    PosterUrl = actor.ImageUrl,
+                                    character = movie.Character
+                                }).ToListAsync();
 
+            if (!actors.Any())
+            {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            
             return Ok(actors);
+        }
+
+        // GET: api/movies?pageNum=&pageSize=
+        // Returns the n top rated movies
+        [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
+        [HttpGet]
+        [Route("api/movies/popular")]
+        public async Task<IHttpActionResult> GetPopular(int pageSize=20, int pageNum=1)
+        { 
+            var movies = await db.Movies
+                        .OrderByDescending(m => m.Rating)
+                        .Select(m => new {
+                              MovieId = m.MovieId,
+                              Title = m.Title,
+                              Rating = m.Rating,
+                              PosterUrl = m.PosterUrl,
+                         })
+                        .ToListAsync();
+
+            var page = movies.Skip((pageNum - 1) * pageSize).Take(pageSize);
+
+            if (!page.Any())
+            {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+
+            return Ok(page);
         }
     }
 }

@@ -1,13 +1,13 @@
 <template>
-  <home-page></home-page>
+  <base-page></base-page>
 </template>
 <script>
-  import HomePage from './views/HomePage';
+  import BasePage from './views/BasePage';
 
     export default {
       name: 'App',
       components: {
-        HomePage
+        BasePage
       }
     }
 </script>

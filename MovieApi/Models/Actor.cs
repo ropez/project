@@ -3,12 +3,14 @@ namespace MovieApi.Models
     using MovieApi.Searchable;
     using Newtonsoft.Json;
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
+    using System.Data.Entity.Spatial;
 
-    [Table("Actor")]
     public partial class Actor : ISearchable
     {
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ActorId { get; set; }
 
@@ -16,7 +18,7 @@ namespace MovieApi.Models
         public string Name { get; set; }
 
         [Column(TypeName = "date")]
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
 
         [Column(TypeName = "date")]
         public DateTime? DeathDate { get; set; }
@@ -24,16 +26,17 @@ namespace MovieApi.Models
         [Required]
         public string Description { get; set; }
 
-        [Required]
         public string ImageUrl { get; set; }
-        
+
         [JsonIgnore]
-        public string searchableData
+        [NotMapped]
+        public string SearchableData
         {
             get
             {
                 return Name;
             }
         }
+        
     }
 }

@@ -8,6 +8,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using MovieApi.Context;
+using MovieApi.Interfaces;
+using MovieApi.Models;
 using MovieApi.Searchable;
 using WebApi.OutputCache.V2;
 
@@ -15,46 +17,72 @@ namespace MovieApi.Controllers
 {
     public class SearchController : ApiController
     {
+        private IMDbContext db = new MDbContext();
 
-        private readonly MovieDbContext db = new MovieDbContext();
+        public SearchController() { }
 
+        public SearchController(IMDbContext db)
+        {
+            this.db = db;
+        }
 
         // GET: api/search
         // Returns a page of movies
         [HttpGet]
         [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
-        public async Task<IHttpActionResult> Search(string key)
+        public async Task<IHttpActionResult> Search(string key, int pageNum=1, int pageSize=20)
         {
 
-            if (string.IsNullOrWhiteSpace(key))
+            if (string.IsNullOrWhiteSpace(key) || key.Length <= 0)
             {
                 return BadRequest("Unvalid search key");
             }
 
-            var result = (await db.Actors.ToListAsync())
-                            .Select(a => new RankedSearchable() { Searchable = a, Rank = CalcRank(a, key) }) 
+            var actorResult = (await db.Actors.ToListAsync())
+                            .Select(a => new RankedDTO() {
+                                Type = "actor",
+                                Id = a.ActorId,
+                                Rank = CalcRank(a, key),
+                                Key = a.SearchableData,
+                            }) 
                             .Where(obj => obj.Rank > 0);
 
-            
             var movieResult = (await db.Movies.ToListAsync())
-                            .Select(m => new RankedSearchable() { Searchable = m, Rank = CalcRank(m, key) })
+                            .Select(m => new RankedDTO() {
+                                Type = "movie",
+                                Id = m.MovieId,
+                                Rank = CalcRank(m, key),
+                                Key = m.SearchableData
+
+                            })
                             .Where(obj => obj.Rank > 0);
+            
+            var result = actorResult.Concat(movieResult);
+            var orderedResult = result.OrderByDescending(obj => obj.Rank);
+            var page = orderedResult.Skip((pageNum - 1) * pageSize).Take(pageSize);
 
-            result = result.Concat(movieResult);
-            var orderedResult = result.OrderBy(obj => obj.Rank)
-                                      .Select(obj => obj.Searchable);
-
-            return Ok(orderedResult);
-        }
-
-        private static double CalcRank(ISearchable searchable, string query)
-        {
-            double rank = -1;
-            if (searchable.searchableData.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
+            if (!page.Any())
             {
-                rank = searchable.searchableData.Length / query.Length;
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+
+            return Ok(page);
+        }
+        
+        public static int CalcRank(ISearchable searchable, string query)
+        { 
+            int rank = 0;
+
+            if(query.Length == 0)
+            {
+                return rank;
+            }
+
+            if (searchable.SearchableData.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                rank = (int) ((double)query.Length / searchable.SearchableData.Length * 100);
             }
             return rank;
-        }
+        }  
     }
 }

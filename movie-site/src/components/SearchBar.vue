@@ -1,6 +1,6 @@
 <template>
     <div style="width: 100%">
-        <input type="text" placeholder="Search for movie or actor..">
+        <input v-model="query" type="text" placeholder="Search for movie or actor..">
         <button @click="performSearch">search</button>     
     </div>
 </template>
@@ -8,19 +8,26 @@
     import { eventBus } from '../main';
     export default {
         data() {
-            return {}
+            return {
+                query: '',
+                searchResult: []
+            }
         },
         methods: {
             performSearch() {
-                console.log("searchCompleted")
-                var res = ["tage", "per", "lars"]
-                eventBus.$emit('searchCompleted', res)
-    
-                if(res.length > 0) {
-                    eventBus.$emit('hasElements', true)
-                } else {
-                    eventBus.$emit('hasElements', false)
+                if(this.query.Length == 0) {
+                    return;
                 }
+
+                 this.$http.get('search?key=' + this.query).then((response) => {
+                    this.searchResult = response.data;
+                    this.notify()
+                
+                });
+            },
+            notify() {
+                eventBus.$emit('searchResult', this.searchResult)
+    
             }
         }
     };

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="header">
-            <h1 class="center-text"> A header</h1>
+            <h1 class="center-text">A header</h1>
             <h3 class="center-text">Smaller text. Dumb Catchy slogan.</h3>
         </div>
             <search-bar></search-bar>

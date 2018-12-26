@@ -9,33 +9,30 @@ using WebApi.OutputCache.V2;
 using MovieApi.Models;
 using MovieApi.Context;
 using System.Collections.Generic;
+using System.Web.Http.Description;
+using MovieApi.Interfaces;
 
 namespace MovieApi.Controllers
     
 {
     public class ActorsController : ApiController
     {
-        private readonly MovieDbContext db = new MovieDbContext();
+        private IMDbContext db = new MDbContext();
+        
+        public ActorsController() { }
 
-        // GET: api/Actors
-        // Returns a page of actors
-        [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
-        public async Task<IHttpActionResult> GetActors(int pageNumber=1, int pageSize=10)
+        public ActorsController(IMDbContext db)
         {
-            var sorted = await db.Actors.OrderBy(a => a.Name).ToListAsync();
-            if(sorted == null)
-            {
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-
-            return Ok(sorted.Skip((pageNumber - 1) * pageSize).Take(pageSize));
+            this.db = db;
         }
-
+  
         // GET: api/Actors/5
-        // Returns the actor with a specific id
+        // Returns the actor with a specific id 
         public IHttpActionResult GetActor(int id)
         {
-            Actor actor = db.Actors.Find(id);
+              
+            var actor = db.Actors.Find(id);
+
             if (actor == null)
             {
                 return StatusCode(HttpStatusCode.NoContent);
@@ -43,21 +40,30 @@ namespace MovieApi.Controllers
 
             return Ok(actor);
         }
-        
+       
         // GET: api/Actors/Credits/id
         // Returns the movies the actor with a specific id has starred in
         [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
         [Route("api/actors/{id}/credits")]
         public async Task<IHttpActionResult> GetMovies(int id)
-        {
-            var movies = await(from movie in db.Movies
-                         join actor in db.MovieCasts on movie.MovieId equals actor.MovieId
-                         where actor.ActorId == id
-                         select movie).ToListAsync();
+        { 
+            var movies = await (db.MovieCasts
+                    .Join(db.Movies, mc => mc.MovieId, m => m.MovieId, (mc, m) => new {mc, m})
+                    .Where(obj => obj.mc.ActorId == id)
+                    .Select(obj => new {
+                        MovieId = obj.m.MovieId,
+                        Title = obj.m.Title,
+                        Rating = obj.m.Rating,
+                        Poster = obj.m.PosterUrl
+                    }).ToListAsync());
+
+
+            if (!movies.Any())
+            {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
 
             return Ok(movies);
         }
-
-       
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AutoMapper;
+using MovieApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,6 +13,7 @@ namespace MovieApi
     {
         protected void Application_Start()
         {
+
             GlobalConfiguration.Configure(WebApiConfig.Register);
         }
     }

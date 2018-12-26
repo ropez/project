@@ -7,10 +7,15 @@ using System.Web;
 
 namespace MovieApi.Searchable
 {
-    public class RankedSearchable
+    public class RankedDTO
     {
-        public ISearchable Searchable { get; set; }
-        public double Rank { get; set; }
+        public string Type { get; set; }
+
+        public int Rank { get; set; }
+
+        public string Key { get; set; }
+
+        public int Id { get; set; }
     }
 }
 

@@ -9,6 +9,6 @@ namespace MovieApi.Searchable
 {
     public interface ISearchable
     {
-        string searchableData { get; }
+        string SearchableData { get; }
     }
 }

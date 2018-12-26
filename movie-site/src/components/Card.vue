@@ -1,6 +1,6 @@
 <template>
     <div>
-        <slot></slot>
+        <router-link></router-link>
     </div>
 </template>
 <script>
@@ -9,4 +9,5 @@
             return {}
         }
     };
-    </script>
+// Card kan kanskje skales opp og fikses litt for å vise movie og actor details?
+</script>
