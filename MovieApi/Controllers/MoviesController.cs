@@ -7,6 +7,8 @@ using WebApi.OutputCache.V2;
 using MovieApi.Context;
 using MovieApi.Models;
 using MovieApi.Interfaces;
+using System.Collections.Generic;
+using MovieApi.DTOs;
 
 namespace MovieApi.Controllers
 {
@@ -38,12 +40,7 @@ namespace MovieApi.Controllers
                          Genres = m.Genres.Select(g => g.Name),
                          Directors = m.Directors.Select(d => d.Name),
                      });
-
-            if (!movie.Any())
-            {
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-            
+       
             return Ok(movie);
         }
 
@@ -56,18 +53,14 @@ namespace MovieApi.Controllers
             var actors = await (from actor in db.Actors
                                 join movie in db.MovieCasts on actor.ActorId equals movie.ActorId
                                 where movie.MovieId == id
-                                select new {
-                                    ActorId = actor.ActorId,
-                                    Name = actor.Name,
-                                    PosterUrl = actor.ImageUrl,
-                                    character = movie.Character
+                                select new DTO {
+                                    Type = "actor",
+                                    Id = actor.ActorId,
+                                    Key = actor.Name,
+                                    Img = actor.ImageUrl,
+                                    Date = actor.BirthDate
                                 }).ToListAsync();
 
-            if (!actors.Any())
-            {
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-            
             return Ok(actors);
         }
 
@@ -88,14 +81,10 @@ namespace MovieApi.Controllers
                          })
                         .ToListAsync();
 
+            var totalCount = movies.Count();
             var page = movies.Skip((pageNum - 1) * pageSize).Take(pageSize);
-
-            if (!page.Any())
-            {
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-
-            return Ok(page);
+           
+            return Ok(new { Count = totalCount , Page = page });
         }
     }
 }

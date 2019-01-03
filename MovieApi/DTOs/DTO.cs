@@ -1,21 +1,20 @@
-﻿using MovieApi.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
 
-namespace MovieApi.Searchable
+namespace MovieApi.DTOs
 {
-    public class RankedDTO
+    public class DTO
     {
         public string Type { get; set; }
-
-        public int Rank { get; set; }
 
         public string Key { get; set; }
 
         public int Id { get; set; }
+
+        public string Img { get; set; }
+
+        public DateTime? Date { get; set; }
     }
 }
-

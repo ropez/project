@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using MovieApi.Context;
+using MovieApi.DTOs;
 using MovieApi.Interfaces;
 using MovieApi.Models;
 using MovieApi.Searchable;
@@ -44,6 +45,8 @@ namespace MovieApi.Controllers
                                 Id = a.ActorId,
                                 Rank = CalcRank(a, key),
                                 Key = a.SearchableData,
+                                Img = a.ImageUrl,
+                                Date = a.BirthDate
                             }) 
                             .Where(obj => obj.Rank > 0);
 
@@ -52,21 +55,19 @@ namespace MovieApi.Controllers
                                 Type = "movie",
                                 Id = m.MovieId,
                                 Rank = CalcRank(m, key),
-                                Key = m.SearchableData
+                                Key = m.SearchableData,
+                                Img = m.PosterUrl,
+                                Date = m.Released,
 
                             })
                             .Where(obj => obj.Rank > 0);
             
             var result = actorResult.Concat(movieResult);
             var orderedResult = result.OrderByDescending(obj => obj.Rank);
+            var totalMatches = orderedResult.Count();
             var page = orderedResult.Skip((pageNum - 1) * pageSize).Take(pageSize);
-
-            if (!page.Any())
-            {
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-
-            return Ok(page);
+      
+            return Ok(new { Count = totalMatches, Page = page });
         }
         
         public static int CalcRank(ISearchable searchable, string query)
