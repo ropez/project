@@ -8,7 +8,6 @@ using MovieApi.Context;
 using MovieApi.Models;
 using MovieApi.Interfaces;
 using System.Collections.Generic;
-using MovieApi.DTOs;
 
 namespace MovieApi.Controllers
 {
@@ -40,6 +39,12 @@ namespace MovieApi.Controllers
                          Genres = m.Genres.Select(g => g.Name),
                          Directors = m.Directors.Select(d => d.Name),
                      });
+
+            if (!movie.Any())
+            {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+
        
             return Ok(movie);
         }
@@ -53,13 +58,19 @@ namespace MovieApi.Controllers
             var actors = await (from actor in db.Actors
                                 join movie in db.MovieCasts on actor.ActorId equals movie.ActorId
                                 where movie.MovieId == id
-                                select new DTO {
+                                select new {
                                     Type = "actor",
                                     Id = actor.ActorId,
                                     Key = actor.Name,
                                     Img = actor.ImageUrl,
-                                    Date = actor.BirthDate
+                                    Date = actor.BirthDate,
+                                    Character = movie.Character
                                 }).ToListAsync();
+            if (!actors.Any())
+            {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            
 
             return Ok(actors);
         }
@@ -74,17 +85,17 @@ namespace MovieApi.Controllers
             var movies = await db.Movies
                         .OrderByDescending(m => m.Rating)
                         .Select(m => new {
-                              MovieId = m.MovieId,
+                              Id = m.MovieId,
                               Title = m.Title,
                               Rating = m.Rating,
                               PosterUrl = m.PosterUrl,
-                         })
+                              Genres = m.Genres.Select(g => g.Name)
+                        })
                         .ToListAsync();
-
-            var totalCount = movies.Count();
+            
             var page = movies.Skip((pageNum - 1) * pageSize).Take(pageSize);
            
-            return Ok(new { Count = totalCount , Page = page });
+            return Ok(page);
         }
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div >
+    <div id='searchbar'>
         <input class='bar position'
             v-model='query'  
             type='text' 
@@ -9,8 +9,8 @@
 </template>
 <script> 
 
-    import { mapActions } from 'vuex';
-  
+    import { httpRequest } from '../div/HttpRequest';
+
     export default {
         props: {
             placeHolder: {
@@ -24,27 +24,23 @@
             }
         },
         methods: {
-            ...mapActions(['search']),
             performSearch() {
                 if(this.query.trimStart().length === 0)
                     return
-                
-                console.log('searchbar: ' + this.query)
-               
-                this.search({
-                    key: this.query,
-                    pageNum: 1
-                })
-                .then(response => {
-                    this.query = ''
-                    this.$router.push('result')
-                })
-            } 
-        }, }
+
+               this.$router.push({ name: 'result', query: { key: this.query, pageNum: 1}})
+               this.query = ''          
+        }, 
+    }
+}
 
 </script>
 <style scoped>
-    
+
+    #searchbar  {
+        background-color: white;
+    }
+
     .position {
         position: relative;
         padding-left:30px;

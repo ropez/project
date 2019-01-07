@@ -1,11 +1,13 @@
-﻿using System;
+﻿using MovieApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
-namespace MovieApi.DTOs
+namespace MovieApi.DTO
 {
-    public class DTO
+    public class RankedDTO 
     {
         public string Type { get; set; }
 
@@ -16,5 +18,8 @@ namespace MovieApi.DTOs
         public string Img { get; set; }
 
         public DateTime? Date { get; set; }
+
+        public int Rank { get; set; }
     }
 }
+

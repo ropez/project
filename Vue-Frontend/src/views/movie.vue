@@ -1,49 +1,74 @@
 <template>
     <div id='movie'> 
-        <div class='column'>
-            <div class='left_column'>
-                <img :src='movie.PosterUrl | fullUrl' alt='Image'>
-                </div>
-             <div class='right_column'>
-                    <div> {{ movie }} </div>
-                     
+        <div class='presentation_container'>
+            <profile-card :imageUrl="movie.PosterUrl | getFullUrl"> 
+                    <div slot='title'> {{ movie.Title }} </div>
+                    <div slot='date'> Released: {{ movie.Released | formatDate }} </div>
+                    <div slot='overview'>{{ checkOverView() }} </div>
+                    <div slot='rating'>{{ movie.Rating }} </div>
+                    <div slot='director'>Director: {{ movie.Directors | arrayToList }}</div>
+                    <div slot='genre'>Genre: {{ movie.Genres | arrayToList }}</div> 
+            </profile-card>   
+        </div>
+        <div class='banner grey'> <h2>Credits</h2> </div>    
+         <div class='grid_container'>
+            <div class='grid_two_col'>
+            <router-link class='grid_two_col' v-for='(actor, i) in credits' :key='i' :to='{name: actor.Type, params: { id: actor.Id }}'>
+                        <result-card :img='actor.Img | getFullUrl'>
+                            <div slot='title'> {{actor.Key}}</div>
+                            <div slot='info'>Actor</div>
+                        </result-card>
+                        
+                </router-link>
             </div>
         </div>
-            <div class='banner'> <h2> Acted in </h2></div>
-            <grid :items='movieCredits'></grid>
-       
+
     </div>
 </template>
 <script>
-    import Vue from 'vue'
-    import Grid from '../components/grid'
-    import { mapState } from 'vuex';
-    import { store } from '../store/store';
+    import Vue from 'vue';
+    import { httpRequest } from '../div/HttpRequest';
+    import ResultCard from '../components/ResultCard';
+    import ProfileCard from '../components/ProfileCard';
 
     export default {
         data() {
             return {
-            
+                movie: JSON,
+                credits: JSON
             }
         },
-        computed: {
-            ...mapState(['movie', 'movieCredits'])
+        methods: {
+            checkOverView() {
+                return this.movie.Description === "" ? 'No information available.' : this.movie.Description
+            },
+         
         },
         components: {
-            Grid
-        },
+           ResultCard,
+           ProfileCard
+        }, 
         created() {
-           store.dispatch('fetchMovieCredits')
+             httpRequest.fetchMovieCredits(this.$route.params.id)
+                    .then(response => this.credits = response.body)   
         },
-        beforeRouteEnter (to, from, next) {
-            if(store.state.movieId === 0) {
-                next('home')
-            } else {
-                store.dispatch('fetchMovie')
-                    .then(response => next())
-                    .catch(error => next(false))
-            }
-        }      
+        beforeRouteEnter(to, from, next) {
+            httpRequest.fetchMovie(to.params.id)
+                .then(response => {
+                    if(response.status == 204) {
+                        next('notfound')
+                    }
+                    next(vm =>  vm.movie = response.body[0])
+                })
+                .catch(error => { 
+                    alert('An error occured trying to retrieve data from the server.')
+                    next(false)
+                })   
+        },       
     }
-
 </script>
+<style scoped> 
+    #movie {
+        margin-top: 16em;
+    }
+</style>

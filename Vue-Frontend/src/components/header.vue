@@ -1,9 +1,14 @@
 <template>
         <div id='header'>
             <div class='logo'>
-                <img src='../assets/logo.png' alt='Logo Image'>
+                <div class='no_stretch'>
+                    <img src='../assets/logo.png' alt='Logo Image'>
+                </div>
                 <div id="nav">
                     <ul>
+                        <router-link to='/'>
+                             <li>Home</li>
+                        </router-link>
                         <li @click='toggleNews' v-on-clickaway="closeNews"> 
                             News
                             <div class='dropdown' :class='{"open" : newsOpen}'>
@@ -21,11 +26,13 @@
             </div>
             <search-bar placeHolder='Find your new favourite movie or actor...'>
             </search-bar>
+            <div class='bottom'>
+            </div>
         </div>
         
 </template>
 <script> 
-    import SearchBar from './searchbar';
+    import SearchBar from './SearchBar';
     import { directive as onClickaway } from 'vue-clickaway';
 
     export default {
@@ -65,38 +72,56 @@
         position: fixed;
         width: 100%;
         top: 0;
-        border-bottom: 1em solid #3DBAF1;
+        z-index: 10;
     }
-
 
     .logo {
         display: flex;
         height: 10em;
-        background-color: #3DBAF1;
+        background: rgb(0,212,255);
+        background: linear-gradient(90deg, rgba(0,212,255,1) 1%, rgba(14,12,75,1) 64%, rgba(0,26,36,1) 99%);
     }
     
     .logo img {
+        flex: 3;
         margin-left: 3em;
         height: 10em;
+    }
+
+    .bottom {
+        width: 100%;
+        height: 1em;
+        background: linear-gradient(90deg, rgba(0,212,255,1) 1%, rgba(14,12,75,1) 64%, rgba(0,26,36,1) 99%);
+    }
+
+
+    .no_stretch {
+        flex: 1;
         width: 30em;
     }
 
+    a {
+        text-decoration: none;
+    }
+
     #nav ul {
-        margin: 3.6em auto auto 43em;
+        flex-basis: auto;
         list-style-type: none;
         display: flex;
+        margin-right: 2em;
     }
 
     #nav ul li {
-        margin: 0 0.6em;
+        margin: 1.5em 0.8em;
         font-size: 1.2em;
         color: white;
-        transition: font-size 200ms;
+        line-height: 2em;
+        text-shadow: 2px 2px black;
+        transition: border-bottom 300ms;
     }
 
     #nav ul li:hover {
-        margin: 0 0.6em;
-        font-size: 1.5em;
+        border-bottom: 3px solid white;
     } 
 
     .dropdown {
@@ -107,13 +132,14 @@
         visibility:collapse;
         position: absolute;
         opacity: 0;
-        background-color: #3DBAF1;
+        background-color: rgb(143, 156, 159);
         transition: opacity 0.5s;
-        margin-top: 0.2em;
+        margin-top: 0em;
     }
 
     .open {
         visibility: visible;
         opacity: 100;
     }
+
 </style>

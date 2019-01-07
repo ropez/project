@@ -11,7 +11,6 @@ using MovieApi.Context;
 using System.Collections.Generic;
 using System.Web.Http.Description;
 using MovieApi.Interfaces;
-using MovieApi.DTOs;
 
 namespace MovieApi.Controllers
     
@@ -36,7 +35,7 @@ namespace MovieApi.Controllers
 
             if (actor == null)
             {
-                actor = new Actor();
+                return StatusCode(HttpStatusCode.NoContent);
             }
 
             return Ok(actor);
@@ -51,13 +50,17 @@ namespace MovieApi.Controllers
             var movies = await (db.MovieCasts
                     .Join(db.Movies, mc => mc.MovieId, m => m.MovieId, (mc, m) => new {mc, m})
                     .Where(obj => obj.mc.ActorId == id)
-                    .Select(obj => new DTO {
+                    .Select(obj => new {
                         Type = "movie",
                         Id = obj.m.MovieId,
                         Key = obj.m.Title,
                         Img = obj.m.PosterUrl,
                         Date = obj.m.Released
                     }).ToListAsync());
+
+            if (!movies.Any()) {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
 
             return Ok(movies);
         }

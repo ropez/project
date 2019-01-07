@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using MovieApi.Context;
-using MovieApi.DTOs;
+using MovieApi.DTO;
 using MovieApi.Interfaces;
 using MovieApi.Models;
 using MovieApi.Searchable;
