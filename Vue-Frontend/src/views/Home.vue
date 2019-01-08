@@ -1,3 +1,10 @@
+<!-- The home page for the app
+     show a 'landing' image with some text, and below
+     some oldies but goldies/higly rated movies from the dtaabase.
+
+     The movies are wrapped in router links.
+-->
+
 <template>
     <div id='home'>
         <div class='landing'>
@@ -32,6 +39,9 @@
         components: {
             ProfileCard
         },
+        // We only need to fetch data when this page is created, since the data is static (We only
+        // retrieve a certain number of highly rated movies and thats that). If the user clicks
+        // the home button when on the home page, there's nothing to update.
         created() {
            httpRequest.fetchPopular(1)
                         .then(response => {
@@ -55,25 +65,16 @@
         height: auto;
     }
 
+    /* Landing image and text */
+
     .landing {
         flex: 2;
         display: flex;
         justify-content: center;
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../assets/gal_gadot.jpg');
+        background: url('../assets/gal.jpg');
         background-repeat: no-repeat;
         background-size: cover;
         height: 40rem;   
-    }
-
-    .grid_padding {
-        margin: 1% 1%;
-    }
-
-    .grid_six_col {
-        flex: 0.5;
-        display: grid;
-        grid-template-columns: repeat(5, 12rem);
-        margin: auto auto;
     }
 
     .text {
@@ -90,14 +91,31 @@
         margin-left: 3em;
     }
 
+    /* Grid of movies */
+
+    .grid_padding {
+        margin: 1% 1%;
+    }
+
+    .grid_six_col {
+        flex: 0.5;
+        display: grid;
+        grid-template-columns: repeat(5, 12rem);
+        margin: auto auto;
+    }
+
+    /* Seapration bar between landing image and movies grid*/
+
     .bar {
         display: flex;
         justify-content: center;
         align-items: center;
         font-weight: 100;
-        font-size: 3rem;
+        font-size: 2.5rem;
         color: black;
-        margin: 1rem auto;
+        margin: 2rem auto;
+        border-top: 0.2rem solid black;
+        border-bottom: 0.2rem solid black;
     }
 
 

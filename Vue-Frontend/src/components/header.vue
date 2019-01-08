@@ -1,3 +1,7 @@
+<!-- 
+     A header component that contains a logo, a small menu where pressing home routes to the home page. In addition
+     the searchbar is a component in the header. The header is fixed at the top of the page 
+--> 
 <template>
         <div id='header'>
             <div class='logo'>
@@ -63,10 +67,11 @@
             onClickaway: onClickaway,
         },
     }    
-
-    //search bar: align-item.: flex end; in y dir. eller align-self
 </script>
 <style scoped>
+
+    /* Logo and background. Bottom is a border between the searchbar
+       and the main view */
 
     #header {
         position: fixed;
@@ -84,8 +89,9 @@
     
     .logo img {
         flex: 3;
-        margin-left: 3em;
-        height: 10em;
+        margin-left: 8.5em;
+        margin-top: 2.5em;
+        height: 5em;
     }
 
     .bottom {
@@ -99,6 +105,8 @@
         flex: 1;
         width: 30em;
     }
+
+    /* Nav/Menu */
 
     a {
         text-decoration: none;
@@ -123,6 +131,8 @@
     #nav ul li:hover {
         border-bottom: 3px solid white;
     } 
+
+    /* Dropdown menu */
 
     .dropdown {
         border: 1px solid;

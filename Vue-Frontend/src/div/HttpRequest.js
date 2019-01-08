@@ -1,6 +1,10 @@
 import Vue from 'vue';
 import { appConfig } from './Config'
 
+/*
+    Collecting things that might change (endpoints) in one place.
+*/
+
 export const httpRequest = {
 
     fetchSearch(key, pageNum, pageSize) {

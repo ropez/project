@@ -1,3 +1,9 @@
+<!--
+    The header and footer components are always alive.
+    The other views are inserted into the router-view
+    between them.
+-->
+
 <template>
   <div id="app">
       <app-header></app-header>
@@ -18,25 +24,30 @@
 </script>
 <style>
 
+    /*
+        Various App wide CSS settings
+    */
+
      body {
         margin: 0;
         padding: 0;
         width: 100%;
         height: 100%;
         font-size: 100%;
-        font-family: 'Roboto', Arial;
+        font-family: Arial, sans-serif;
+    }
+    
+    p {
+        font-size: 1.2rem;
     }
 
     a {
         text-decoration: none;
     }
 
+
     .row {
         display: flex;
-    }
-
-    p {
-        font-size: 1.2rem;
     }
 
     .col {
@@ -69,6 +80,8 @@
         display: grid;
         grid-template-columns: auto auto;
         justify-content: center;
+        grid-column-gap: 0.5rem;
+
     }
 
     .grid_container {
@@ -80,11 +93,4 @@
         margin: 0 auto;
 
     }
-    @media (max-width: 400px) {
-        .flex-grid {
-         display: block;
-  }
-}
-
-
 </style>

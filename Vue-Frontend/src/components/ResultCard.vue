@@ -1,3 +1,8 @@
+<!-- A card for a short presentatoin of a movie or an actor.
+     Shows an image and a title and info. Available via named slots
+     (except image which need to be attached as a prop)
+-->  
+
 
 <template>
     <div id='card'>

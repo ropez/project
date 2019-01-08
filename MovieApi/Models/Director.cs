@@ -6,6 +6,16 @@ namespace MovieApi.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
+
+    // The database table/model for a Director. 
+    // The table is used to bind a director id to a name.
+    //
+    // The MovieDirector junction table connects a director id
+    // a movie(s)
+    //
+    // If one wanted to make Directos searchable he Could just implement 
+    // the ISeacrhAble interface
+
     public partial class Director
     {
         [Key]

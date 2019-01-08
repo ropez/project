@@ -7,6 +7,8 @@ using System.Web;
 
 namespace MovieApi.Interfaces
 {
+
+    // An interface that the DbContext can implement to enable mocking
     public interface IMDbContext
     {
         DbSet<Actor> Actors { get; set; }

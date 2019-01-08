@@ -1,4 +1,8 @@
 
+/*
+  Collecting the settings in one place.
+*/
+
 export const appConfig = {
     pageSize: 40,
     numFrontPageMovies:  25,

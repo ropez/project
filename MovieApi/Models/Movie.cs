@@ -8,6 +8,10 @@ namespace MovieApi.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
+    
+    // The database table/model for a Movie object 
+    // Implements the ISearchAble interface
+
     public partial class Movie : ISearchable
     {
         [Key]

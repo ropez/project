@@ -1,3 +1,22 @@
+<!--
+    A componnet/page that shows details about an movie. Uses the component
+    PresentationCard to display the info. 
+
+    A list of all the actors in the movie and their played characters are also showed. These
+    are presented using ResultCards.
+
+    The resultCards (movies) are made clickable by enclosing them in a router link,
+    so that they route to their own details page.
+
+    The movie and the actor page are very similar, so one could arguably had made a another
+    component, where one just filled in the actor/movie data into, and then drop the actor and
+    movie component.
+
+    Formatting of data in this component is mainly done by filters, as the same formatting also
+    has to be done in the resultcards when we display search results, and in the 'mini' profile cards.
+-->
+
+
 <template>
     <div id='movie'> 
         <div class='presentation_container'>
@@ -13,10 +32,10 @@
         <div class='banner grey'> <h2>Credits</h2> </div>    
          <div class='grid_container'>
             <div class='grid_two_col'>
-            <router-link class='grid_two_col' v-for='(actor, i) in credits' :key='i' :to='{name: actor.Type, params: { id: actor.Id }}'>
+            <router-link class='grid_two_col' v-for='(actor, i) in credits' :key='i' :to='{name: "actor", params: { id: actor.Id }}'>
                         <result-card :img='actor.Img | getFullUrl'>
                             <div slot='title'> {{actor.Key}}</div>
-                            <div slot='info'>Actor</div>
+                            <div slot='info'>as {{actor.Character}}</div>
                         </result-card>
                         
                 </router-link>
@@ -48,6 +67,10 @@
            ResultCard,
            ProfileCard
         }, 
+
+        /*
+            Follows the same lofic as in the Actor component.
+        */
         created() {
              httpRequest.fetchMovieCredits(this.$route.params.id)
                     .then(response => this.credits = response.body)   
@@ -55,7 +78,8 @@
         beforeRouteEnter(to, from, next) {
             httpRequest.fetchMovie(to.params.id)
                 .then(response => {
-                    if(response.status == 204) {
+                    if(response.status != 200) {
+                        next(false)
                         next('notfound')
                     }
                     next(vm =>  vm.movie = response.body[0])

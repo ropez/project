@@ -7,6 +7,16 @@ namespace MovieApi.Context
     using MovieApi.Models;
     using MovieApi.Interfaces;
 
+    //
+    // The database context
+    //
+    //  The database contains the tables Actors, Movies, MovieCasts, Genres and Directors
+    //  and the structur of these tables can be seen in the models folder. Two junction
+    //  tables are in addition automatically generated, GenreMovies and MovieDirectors.
+    //  These junction tables enables us to use navigational Linq queries between the tables. 
+    //  See the method GetMovies in Movies controller for an example.
+    // 
+
     public partial class MDbContext : DbContext, IMDbContext
     {
         public MDbContext()

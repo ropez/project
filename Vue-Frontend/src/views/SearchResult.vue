@@ -1,3 +1,14 @@
+<!--
+    A component that performs a search request API and displays the result.
+    Shows a summary: search key, number of maches, and number of pages of results.
+    And a column of results where each result is displayed as a result card,
+
+    The cards are wrapped in a router link so they link to their own details page.
+
+    This page uses the Pagination component.
+-->
+
+
 <template>
     <div id="result"> 
             <div class='row'>
@@ -38,23 +49,33 @@
                 numMatches: Number,
                 searchResult: JSON,
                 curPage: Number
-            }
+            }  
         },
         computed: {
-            maxPages() {
+             maxPages() {
                 return Math.ceil(this.numMatches / appConfig.pageSize)
             }, 
         },
         methods: {
+            // Receives a message/clicked page number from Pagination.
+            // Routes to this (SearchhResult) compoonent with the pagenumber and search key
             pageButtonClicked(pageNum) {
                 this.$router.push({ name: 'result', query: { key: this.key, pageNum: pageNum }})
             }, 
+            /*
+                Convenience method for setting data from the Http request.
+            */
             setData(key, pageNum, searchResult, numMatches) {
                 this.key = key
                 this.searchResult = searchResult
                 this.numMatches = numMatches
                 this.curPage = pageNum
             },
+            /*
+                If the user clicks the url/adress in the browser, the pageNumber is returned as a string.
+                We must therefore check this, and convert it. And if its not a valid number, we just
+                return page 1.
+            */
             curPageAsNum() {
                 if(typeof this.curPage === 'number') return this.curPage
 
@@ -77,6 +98,12 @@
             Pagination,
             ResultCard
         },
+        /*
+        * This component can be routed to by other components and from itself. When routed to by other components
+        * its created, and beforeRouteEnter is called. When routed to by itself the component is reused, beforeRouteEnter is
+        * therefore not called, and we need to do the get request in beforeRouteUpdate.
+        *
+        */
         beforeRouteEnter(to, from, next) {
             httpRequest.fetchSearch(to.query.key, to.query.pageNum)
                 .then(response => {

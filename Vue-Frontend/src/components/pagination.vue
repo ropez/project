@@ -1,3 +1,12 @@
+<!--
+    Pagination when the search result is over one page long. 
+    The max page number to be shown is set by the parent (maxPage), and also 
+    how many page buttons are to be visible at the time (visiblePages).
+
+    The parent must link a method to the pageClicked(pageNum) method to receive
+    the page which has been clicked on.
+-->
+
 <template>
     <div id='pagination'>
         <ul>
@@ -28,6 +37,7 @@
                 curPage: Number,
         },
         computed: {
+            // Computes the range of page buttons to be shown (e.g 2 3 4 5 6)
             pages() {
                 const range = []
 
@@ -39,6 +49,7 @@
                 }
                 return range;
             },
+            // Computes which pageNumber the pages method begin at.
             startPage() {
 
                let startPage;
@@ -53,6 +64,7 @@
             },    
             
         },
+        // Emits which page is clicked on to the parent 
         methods: {
             pageNext() {
                 this.$emit('pageClicked', this.curPage + 1)
@@ -89,6 +101,8 @@
         outline: none;
     }
 
+    /* Line under active page */
+    
     .current {
         border-bottom: 2px solid  #3DBAF1;
     }

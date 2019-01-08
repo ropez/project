@@ -7,6 +7,8 @@ using System.Web;
 
 namespace MovieApi.Searchable
 {
+    // Interface for searchable objects. Every searhable object must supply data {SearcableData}
+    // that can be matched againt the query.
     public interface ISearchable
     {
         string SearchableData { get; }

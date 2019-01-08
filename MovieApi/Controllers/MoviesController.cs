@@ -11,6 +11,9 @@ using System.Collections.Generic;
 
 namespace MovieApi.Controllers
 {
+
+    // The controller responible for handling all request about movie details
+
     public class MoviesController : ApiController
     {
         private IMDbContext db = new MDbContext();
@@ -22,8 +25,17 @@ namespace MovieApi.Controllers
             this.db = db;
         }
 
-        // GET: api/movies/5
-        // Returns the movie with a specific id
+        /*  GET: api/movies/id
+        *   Returns the movie with a specific id
+        *   If no movie is found at that id status code 204 id returned
+        *
+        *   The result of the query is cached at the server end, and 
+        *   a max-age in the respnse header is sendt to the client
+        */
+        
+        /// <param name="id">The id of the movie</param>
+        /// <returns>A Json object or status code 204</returns>
+        [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
         public IHttpActionResult GetMovie(int id)
         {
             var movie = db.Movies
@@ -45,12 +57,19 @@ namespace MovieApi.Controllers
                 return StatusCode(HttpStatusCode.NoContent);
             }
 
-       
             return Ok(movie);
         }
 
-        // GET: api/movies/credits/id
-        // Returns the actors which contributed to the movie with a given id
+        /*  GET: api/movies/id/credits
+        *   Returns the movies an actor has contributed to
+        *   If no movies are found status code 204 id returned
+        *
+        *   The result of the query is cached at the server end, and 
+        *   a max-age in the respnse header is sendt to the client
+        */
+
+        /// <param name="id">The id of the movie</param>
+        /// <returns>A Json object or status code 204</returns>
         [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
         [Route("api/movies/{id}/credits")]
         public async Task<IHttpActionResult> GetActors(int id)
@@ -59,7 +78,6 @@ namespace MovieApi.Controllers
                                 join movie in db.MovieCasts on actor.ActorId equals movie.ActorId
                                 where movie.MovieId == id
                                 select new {
-                                    Type = "actor",
                                     Id = actor.ActorId,
                                     Key = actor.Name,
                                     Img = actor.ImageUrl,
@@ -75,8 +93,14 @@ namespace MovieApi.Controllers
             return Ok(actors);
         }
 
-        // GET: api/movies?pageNum=&pageSize=
-        // Returns the n top rated movies
+        /* GET: api/movies/popular?pageNum=&pageSize=
+        *  Returns the top rated movies in the database in descending order.
+        *  Returns an empty list if none is found.
+        */
+
+        /// <param name="pageSize">The requested number of movies per page</param>
+        /// <param name="pageSize">The sepesific page requsted</param>
+        /// <returns>A Json object, empty if no match</returns>
         [CacheOutput(ClientTimeSpan = 60, ServerTimeSpan = 60)]
         [HttpGet]
         [Route("api/movies/popular")]

@@ -1,3 +1,18 @@
+<!-- A component that presents information about an actor or movie
+     Has two modes, regular or mini.
+
+     In regular mode a picure is placed in the left column, and info in the right.
+     Possible info is title, rating, a date, director, genre and and overview.
+     These are accessible as named slots (expect picture which must be attached as a prop)
+
+     In mini mode we view the whole card as a column, where the picture is on top
+     and the info to the bottom. Overview is not suported in this mode.
+
+     Arguably this could have been split into two diferent card, but its an attempt two
+     play around/resuse a component in differents shapes.
+-->
+
+
 <template>        
     <div id='bigcard' :class="{'bigcard' : !mini, 'mini' : mini}">
         <div :class="{'row' : !mini, 'mini_col' : mini}">
@@ -59,6 +74,7 @@
                 return this.$slots.overview
             }
         },
+        // Id we're in mini mode the title is put under the rating
         created() {
             if(this.mini) {
                 this.miniTitle = this.$slots.title[0].children[0].text
@@ -68,6 +84,9 @@
     }
 </script>
 <style scoped>
+
+    /* CSS for the big card */
+
     .bigcard {
         display: block;
         height: 100%;
@@ -105,6 +124,10 @@
        margin-right: 1.5%;
     }   
 
+    /* Contains the star and the rating, puts them in 
+       a row and aligns theire height */
+
+
     .align {
         display: flex;
         justify-content: flex-start;
@@ -119,6 +142,8 @@
     h1, h2 {
         margin-bottom: 0;
     }
+
+    /* CSS for mini mode */
 
     .mini {
         width: 100%;
@@ -137,7 +162,8 @@
     }
 
     .mini_col .align {
-        margin-top: -0.8rem;
+        margin-top: -1.2rem;
+        margin-bottom: -0.8rem;
         font-style: oblique;
     }
 

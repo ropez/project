@@ -1,3 +1,9 @@
+<!--
+    A searchbar. Takes a placeholder text as a prop. Routes to the result 
+    page with the query string as a query parameter.
+-->
+
+
 <template>
     <div id='searchbar'>
         <input class='bar position'
@@ -8,9 +14,6 @@
     </div>
 </template>
 <script> 
-
-    import { httpRequest } from '../div/HttpRequest';
-
     export default {
         props: {
             placeHolder: {
@@ -43,8 +46,8 @@
 
     .position {
         position: relative;
-        padding-left:30px;
-        text-indent:25px;
+        padding-left:2.5rem;
+        text-indent:2rem;
         font-family: sans-serif, Arial, Helvetica;
         font-style: oblique;
         font-weight: 200;
